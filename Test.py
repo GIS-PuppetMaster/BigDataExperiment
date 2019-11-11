@@ -51,4 +51,4 @@ def test():
     print("score:" + str(score))
 
 
-# test()
+test()

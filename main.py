@@ -118,6 +118,7 @@ class CheckPoint_Save_LR(keras.callbacks.ModelCheckpoint):
                 else:
                     self.model.save(filepath, overwrite=True)
 
+
 lr = 0.05
 
 if os.path.isdir('./tensor_board_logs'):
@@ -188,17 +189,18 @@ else:
     model = load_model('checkPoint.h5')
     with open('checkPoint_LR.json', 'rb') as f:
         lr = pickle.load(f)
-    print("加载学习率:"+str(lr))
     model.compile(keras.optimizers.Adam(lr), loss=keras.losses.categorical_crossentropy, metrics=['mae', 'acc'])
     model.summary()
+    print("加载学习率:" + str(lr))
 
 x_train = np.array(pd.read_csv('Data/x_train.csv'))
 x_train = np.expand_dims(x_train, -1)
 y_train = pd.read_csv('Data/y_train.csv')
 
-reduce_lr = keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.8, patience=50, min_lr=0.001)
+reduce_lr = keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.8, patience=50, min_lr=0.0001)
 # early_stop = keras.callbacks.EarlyStopping(monitor='val_acc', patience=300, restore_best_weights=True)
-check_point = keras.callbacks.ModelCheckpoint(filepath='./checkPoint.h5', monitor='val_acc', save_best_only=True)
+check_point = keras.callbacks.ModelCheckpoint(filepath='./checkPoint.h5', monitor='val_acc', save_best_only=True,
+                                              verbose=1)
 tensor_board = keras.callbacks.TensorBoard(log_dir='./tensor_board_logs', write_grads=True, write_graph=True,
                                            write_images=True)
 
