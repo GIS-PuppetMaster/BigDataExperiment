@@ -83,17 +83,21 @@ def Conv1D_identity_block(input, filters=(3, 3, 3), kernel_size=3,
                       padding=('valid', 'same', 'valid'),
                       data_format='channels_first',
                       activation=('tanh', 'tanh', 'tanh'), block_name='Conv1D_identity_block'):
-    from keras.layers import Conv1D, Activation, BatchNormalization, Concatenate, Add, ZeroPadding1D, Permute
+    from keras.layers import Conv1D, Activation, BatchNormalization, Concatenate, Add, ZeroPadding1D, Permute, Dropout
+    import keras
     shortcut = input
     conv01 = Conv1D(filters=filters[0], kernel_size=1, padding=padding[0], strides=1, data_format=data_format, name=block_name+'conv01')(input)
+    conv01 = Dropout(0.2)(conv01)
     conv01_bn = BatchNormalization(epsilon=1e-4, scale=True, center=True, name=block_name+'conv01_bn')(conv01)
     conv01_ac = Activation(activation[0], name=block_name+'conv01_ac')(conv01_bn)
 
     conv02 = Conv1D(filters=filters[1], kernel_size=kernel_size, padding=padding[1], strides=1, data_format=data_format, name=block_name+'conv02')(conv01_ac)
+    conv02 = Dropout(0.2)(conv02)
     conv02_bn = BatchNormalization(epsilon=1e-4, scale=True, center=True, name=block_name+'conv02_bn')(conv02)
     conv02_ac = Activation(activation[1], name=block_name+'conv02_ac')(conv02_bn)
 
     conv03 = Conv1D(filters=filters[2], kernel_size=1, padding=padding[2], strides=1, data_format=data_format, name=block_name+'conv03')(conv02_ac)
+    conv03 = Dropout(0.2)(conv03)
     conv03_bn = BatchNormalization(epsilon=1e-4, scale=True, center=True, name=block_name+'conv03_bn')(conv03)
     merge03 = Add(name=block_name+'merge03_Add')([conv03_bn, shortcut])
     conv03_ac = Activation(activation[2], name=block_name+'conv03_ac')(merge03)
@@ -104,18 +108,22 @@ def Conv1D_conv_block(input, filters=(3, 3, 3), kernel_size=3, strides=1,
                       padding=('valid', 'same', 'valid', 'valid'),
                       data_format='channels_first',
                       activation=('tanh', 'tanh', 'tanh'), block_name='Conv1D_conv_block'):
-    from keras.layers import Conv1D, Activation, BatchNormalization, Concatenate, Add, ZeroPadding1D, Permute
+    from keras.layers import Conv1D, Activation, BatchNormalization, Concatenate, Add, ZeroPadding1D, Permute, Dropout
+    import keras
     shortcut = input
     conv01 = Conv1D(filters=filters[0], kernel_size=1, padding=padding[0], strides=strides, data_format=data_format, name=block_name+'conv01')(input)
+    conv01 = Dropout(0.2)(conv01)
     conv01_bn = BatchNormalization(epsilon=1e-4, scale=True, center=True, name=block_name+'conv01_bn')(conv01)
     conv01_ac = Activation(activation[0], name=block_name+'conv01_ac')(conv01_bn)
 
     conv02 = Conv1D(filters=filters[1], kernel_size=kernel_size, padding=padding[1], strides=1,
-                    data_format=data_format, name=block_name+'conv02')(conv01_ac)
+                    data_format=data_format, name=block_name+'conv02',kernel_regularizer=keras.regularizers.l2(0.001))(conv01_ac)
+    conv02 = Dropout(0.2)(conv02)
     conv02_bn = BatchNormalization(epsilon=1e-4, scale=True, center=True, name=block_name+'conv02_bn')(conv02)
     conv02_ac = Activation(activation[1], name=block_name+'conv02_ac')(conv02_bn)
 
     conv03 = Conv1D(filters=filters[2], kernel_size=1, padding=padding[2], strides=1, data_format=data_format, name=block_name+'conv03')(conv02_ac)
+    conv03 = Dropout(0.2)(conv03)
     conv03_bn = BatchNormalization(epsilon=1e-4, scale=True, center=True, name=block_name+'conv03_bn')(conv03)
 
     shortcut = Conv1D(filters=filters[2], kernel_size=1, padding=padding[3], strides=strides, data_format=data_format, name=block_name+'shortcut_conv')(shortcut)

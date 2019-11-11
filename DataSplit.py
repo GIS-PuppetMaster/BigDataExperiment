@@ -13,10 +13,17 @@ for i in range(1, 11):
 
 # 补全缺失值为0
 data = data.fillna(0)
+
+"""
+# 添加特征
+# 对每列特征取arctan
+for i in range(1,11):
+    data['Enhance'+str(i)] = np.arctan(np.array(data['Parameter'+str(i)]))
+"""
+
 data.to_csv('Data/data.csv')
 
-raw = np.array(data)
-# 扩展dim为2
+# 扩展标签dim为2
 label = np.expand_dims(np.array(data['Quality_label']), 1)
 
 # 对label进行One-Hot编码
@@ -28,9 +35,14 @@ label = enc.fit_transform(label).toarray()
 with open('OneHotEncoder.json', 'wb') as f:
     pickle.dump(enc, f)
 
-# 分离x
-x = raw[:, :-1]
+# 去掉标签列，分离出x
+data = data.drop(columns=['Quality_label'])
+x = np.array(data)
 x = x.astype(np.float64)
+
+# 打乱x的样本顺序
+# 导致训练集准确率迅速收敛，验证集准确率不变
+# np.random.shuffle(x)
 
 # 对x取log
 x = np.log10(x)
