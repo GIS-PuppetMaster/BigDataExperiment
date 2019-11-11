@@ -119,7 +119,6 @@ class CheckPoint_Save_LR(keras.callbacks.Callback):
                 else:
                     self.model.save(filepath, overwrite=True)
 
-
 lr = 0.05
 
 if os.path.isdir('./tensor_board_logs'):
@@ -129,8 +128,7 @@ if not os.path.exists('./checkPoint.h5'):
     print("未找到CheckPoint，重新初始化模型")
     x_input = Input((10, 1))
 
-    x1 = Conv1D(filters=4, kernel_size=3, strides=1, dilation_rate=2, padding='same',
-                kernel_regularizer=keras.regularizers.l2(0.01))(x_input)
+    x1 = Conv1D(filters=4, kernel_size=3, strides=1, dilation_rate=2, padding='same')(x_input)
     x1 = BatchNormalization(epsilon=1e-4)(x1)
     x1 = Dropout(0.2)(x1)
     x1 = ReLU()(x1)
@@ -140,20 +138,20 @@ if not os.path.exists('./checkPoint.h5'):
     x1 = Dropout(0.2)(x1)
     x1 = ReLU()(x1)
 
-    x2 = Conv1D(filters=4, kernel_size=5, strides=1, kernel_regularizer=keras.regularizers.l2(0.001))(x_input)
+    x2 = Conv1D(filters=4, kernel_size=5, strides=1)(x_input)
     x2 = BatchNormalization(epsilon=1e-4)(x2)
     x2 = Dropout(0.2)(x2)
     x2 = ReLU()(x2)
-    x2 = Conv1D(filters=8, kernel_size=3, strides=2, kernel_regularizer=keras.regularizers.l2(0.001))(x2)
+    x2 = Conv1D(filters=8, kernel_size=3, strides=2)(x2)
     x2 = BatchNormalization(epsilon=1e-4)(x2)
     x2 = Dropout(0.2)(x2)
     x2 = ReLU()(x2)
 
-    x3 = Conv1D(filters=8, kernel_size=5, strides=2, kernel_regularizer=keras.regularizers.l2(0.001))(x_input)
+    x3 = Conv1D(filters=8, kernel_size=5, strides=2)(x_input)
     x3 = BatchNormalization(epsilon=1e-4)(x3)
     x3 = Dropout(0.2)(x3)
     x3 = ReLU()(x3)
-    x3 = Conv1D(filters=8, kernel_size=3, strides=1, kernel_regularizer=keras.regularizers.l2(0.001))(x3)
+    x3 = Conv1D(filters=8, kernel_size=3, strides=1)(x3)
     x3 = BatchNormalization(epsilon=1e-4)(x3)
     x3 = Dropout(0.2)(x3)
     x3 = ReLU()(x3)
@@ -172,11 +170,11 @@ if not os.path.exists('./checkPoint.h5'):
     x5 = Dense_BN(x5, 32, activation='relu')
     x5 = Dense_BN(x5, 16, activation='relu')
 
-    x6 = CuDNNLSTM(10, kernel_regularizer=keras.regularizers.l2(0.01), return_sequences=True)(x_input)
+    x6 = CuDNNLSTM(10, return_sequences=True)(x_input)
     x6 = BatchNormalization()(x6)
     x6 = Dropout(0.2)(x6)
     x6 = Activation('tanh')(x6)
-    x6 = CuDNNLSTM(10, kernel_regularizer=keras.regularizers.l2(0.01), return_sequences=False)(x6)
+    x6 = CuDNNLSTM(10, return_sequences=False)(x6)
     x6 = BatchNormalization()(x6)
     x6 = Dropout(0.2)(x6)
     x6 = Activation('tanh')(x6)
@@ -200,7 +198,10 @@ else:
     print("加载CheckPoint")
     model = load_model('checkPoint.h5')
     with open('checkPoint_LR.json', 'rb') as f:
-        lr = pickle.load(f)
+        temp_lr = pickle.load(f)
+    order = input("是否使用上次学习率:"+str(temp_lr)+"？(y/n)")
+    if order=='y':
+        lr = temp_lr
     opt = keras.optimizers.Adam(lr)
     model.compile(opt, loss=keras.losses.categorical_crossentropy, metrics=['mae', 'acc'])
     model.summary()
@@ -219,7 +220,7 @@ tensor_board = keras.callbacks.TensorBoard(log_dir='./tensor_board_logs', write_
 
 history = model.fit(x_train, y_train, epochs=2500, validation_split=0.1,
                     callbacks=[reduce_lr, check_point, tensor_board], verbose=2,
-                    batch_size=2048, shuffle=True)
+                    batch_size=13632, shuffle=True)
 # 保存最后一次训练的模型
 model.save('model.h5')
 test()
