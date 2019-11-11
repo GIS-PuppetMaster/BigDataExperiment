@@ -16,7 +16,7 @@ import pickle
 from Test import test
 
 
-class CheckPoint_Save_LR(keras.callbacks.ModelCheckpoint):
+class CheckPoint_Save_LR(keras.callbacks.Callback):
     """Save the model after every epoch.
 
         `filepath` can contain named formatting options,
@@ -123,7 +123,7 @@ lr = 0.05
 
 if os.path.isdir('./tensor_board_logs'):
     shutil.rmtree('./tensor_board_logs')
-
+opt = None
 if not os.path.exists('./checkPoint.h5'):
     print("未找到CheckPoint，重新初始化模型")
     x_input = Input((10, 1))
@@ -183,13 +183,15 @@ if not os.path.exists('./checkPoint.h5'):
 
     model = Model(inputs=[x_input], outputs=[x])
     plot_model(model, to_file='model.png', show_shapes=True)
-    model.compile(keras.optimizers.Adam(lr), loss=keras.losses.categorical_crossentropy, metrics=['mae', 'acc'])
+    opt = keras.optimizers.Adam(lr)
+    model.compile(opt, loss=keras.losses.categorical_crossentropy, metrics=['mae', 'acc'])
 else:
     print("加载CheckPoint")
     model = load_model('checkPoint.h5')
     with open('checkPoint_LR.json', 'rb') as f:
         lr = pickle.load(f)
-    model.compile(keras.optimizers.Adam(lr), loss=keras.losses.categorical_crossentropy, metrics=['mae', 'acc'])
+    opt = keras.optimizers.Adam(lr)
+    model.compile(opt, loss=keras.losses.categorical_crossentropy, metrics=['mae', 'acc'])
     model.summary()
     print("加载学习率:" + str(lr))
 
@@ -199,12 +201,12 @@ y_train = pd.read_csv('Data/y_train.csv')
 
 reduce_lr = keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.8, patience=50, min_lr=0.0001)
 # early_stop = keras.callbacks.EarlyStopping(monitor='val_acc', patience=300, restore_best_weights=True)
-check_point = keras.callbacks.ModelCheckpoint(filepath='./checkPoint.h5', monitor='val_acc', save_best_only=True,
-                                              verbose=1)
+check_point = CheckPoint_Save_LR(filepath='./checkPoint.h5', monitor='val_acc', optimizer=opt, save_best_only=True,
+                                 verbose=1)
 tensor_board = keras.callbacks.TensorBoard(log_dir='./tensor_board_logs', write_grads=True, write_graph=True,
                                            write_images=True)
 
-history = model.fit(x_train, y_train, epochs=5000, validation_split=0.1,
+history = model.fit(x_train, y_train, epochs=2500, validation_split=0.1,
                     callbacks=[reduce_lr, check_point, tensor_board], verbose=2,
                     batch_size=2048, shuffle=True)
 test()
