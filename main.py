@@ -1,5 +1,5 @@
 import warnings
-
+import tensorflow as tf
 import sklearn
 from keras.utils import plot_model
 from sklearn.preprocessing import *
@@ -104,7 +104,8 @@ class CheckPoint_Save_LR(keras.callbacks.Callback):
                         else:
                             self.model.save(filepath, overwrite=True)
                         with open('checkPoint_LR.json', 'wb') as f:
-                            lr = self.optimizer.lr
+                            session = keras.backend.get_session()
+                            lr = opt.lr.eval(session=session)
                             pickle.dump(lr, f)
                     else:
                         if self.verbose > 0:
