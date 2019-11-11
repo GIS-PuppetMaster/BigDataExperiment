@@ -1,10 +1,10 @@
-def Dense_BN(input, units=8, bn_axis=-1):
+def Dense_BN(input, units=8, bn_axis=-1, activation='tanh'):
     from keras.layers import Activation, BatchNormalization, Dense, Concatenate, Dropout
     from keras import regularizers
     dense = Dense(units, kernel_regularizer=regularizers.l2(0.01))(input)
     dense = BatchNormalization(axis=bn_axis, epsilon=1e-4, scale=True, center=True)(dense)
     dense = Dropout(0.2)(dense)
-    return Activation('tanh')(dense)
+    return Activation(activation)(dense)
 
 
 def Dense_res_block3(input, layercell=(32, 16)):
