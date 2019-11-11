@@ -172,14 +172,24 @@ if not os.path.exists('./checkPoint.h5'):
     x5 = Dense_BN(x5, 32, activation='relu')
     x5 = Dense_BN(x5, 16, activation='relu')
 
+    x6 = CuDNNLSTM(10, kernel_regularizer=keras.regularizers.l2(0.01), return_sequences=True)(x_input)
+    x6 = BatchNormalization()(x6)
+    x6 = Dropout(0.2)(x6)
+    x6 = Activation('tanh')(x6)
+    x6 = CuDNNLSTM(10, kernel_regularizer=keras.regularizers.l2(0.01), return_sequences=False)(x6)
+    x6 = BatchNormalization()(x6)
+    x6 = Dropout(0.2)(x6)
+    x6 = Activation('tanh')(x6)
+
     x1 = Flatten()(x1)
     x2 = Flatten()(x2)
     x3 = Flatten()(x3)
     x4 = Flatten()(x4)
     x5 = Flatten()(x5)
+    # x6 = Flatten()(x6)
 
-    x = Concatenate()([x1, x2, x3, x4, x5])
-    x = Dense_BN(x, 32)
+    x = Concatenate()([x1, x2, x3, x4, x5, x6])
+    x = Dense_BN(x, 64)
     x = Dense(4, activation='softmax')(x)
 
     model = Model(inputs=[x_input], outputs=[x])
@@ -210,6 +220,8 @@ tensor_board = keras.callbacks.TensorBoard(log_dir='./tensor_board_logs', write_
 history = model.fit(x_train, y_train, epochs=2500, validation_split=0.1,
                     callbacks=[reduce_lr, check_point, tensor_board], verbose=2,
                     batch_size=2048, shuffle=True)
+# 保存最后一次训练的模型
+model.save('model.h5')
 test()
 """
 model.save('model.h5')
