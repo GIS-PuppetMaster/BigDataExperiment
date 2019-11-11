@@ -212,14 +212,14 @@ x_train = np.expand_dims(x_train, -1)
 y_train = pd.read_csv('Data/y_train.csv')
 
 reduce_lr = keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.8, patience=50, min_lr=0.0001)
-# early_stop = keras.callbacks.EarlyStopping(monitor='val_acc', patience=300, restore_best_weights=True)
+early_stop = keras.callbacks.EarlyStopping(monitor='val_acc', patience=200, restore_best_weights=True)
 check_point = CheckPoint_Save_LR(filepath='./checkPoint.h5', monitor='val_acc', optimizer=opt, save_best_only=True,
                                  verbose=1)
 tensor_board = keras.callbacks.TensorBoard(log_dir='./tensor_board_logs', write_grads=True, write_graph=True,
                                            write_images=True)
 
 history = model.fit(x_train, y_train, epochs=2500, validation_split=0.1,
-                    callbacks=[reduce_lr, check_point, tensor_board], verbose=2,
+                    callbacks=[reduce_lr, check_point, tensor_board, early_stop], verbose=2,
                     batch_size=13632, shuffle=True)
 # 保存最后一次训练的模型
 model.save('model.h5')
