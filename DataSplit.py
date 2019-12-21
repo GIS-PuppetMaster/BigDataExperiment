@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 from sklearn.model_selection import *
 from sklearn.preprocessing import *
+from sklearn.ensemble import GradientBoostingClassifier
 import pickle
 
 first = pd.read_csv(open('Data/初赛训练集.csv'))
@@ -9,7 +10,7 @@ second = pd.read_csv(open('Data/second_round_training_data.csv'))
 data = pd.concat((first, second), axis=0, sort=False)
 # 剔除B类属性
 for i in range(1, 11):
-    data.pop('Attribute'+str(i))
+    data.pop('Attribute' + str(i))
 
 # 补全缺失值为0
 data = data.fillna(0)
@@ -58,6 +59,21 @@ with open('Scaler.json', 'wb') as f:
 # 划分训练集和测试集
 x_train, x_test, y_train, y_test = train_test_split(x, label, test_size=0.2, random_state=42)
 
+# 使用GBDT进行特征组合
+
+gbdt_enc = OneHotEncoder()
+gbdt = GradientBoostingClassifier(n_estimators=10)
+gbdt.fit(x_train, enc.inverse_transform(y_train))
+x_train_gbdt = np.array((gbdt_enc.fit_transform(gbdt.apply(x_train)[:, :, 0])).toarray())
+x_test_gbdt = np.array((gbdt_enc.transform(gbdt.apply(x_test)[:, :, 0])).toarray())
+x_train = np.concatenate((x_train, x_train_gbdt), axis=1)
+x_test = np.concatenate((x_test, x_test_gbdt), axis=1)
+# 保存编码器
+with open('GBDT_enc.json', 'wb') as f:
+    pickle.dump(gbdt_enc, f)
+# 保存GBDT
+with open('GBDT.json', 'wb') as f:
+    pickle.dump(scaler, f)
 # 保存训练集和测试集
 pd.DataFrame(x_train).to_csv("Data/x_train.csv", index=False, float_format='%.16f')
 pd.DataFrame(x_test).to_csv("Data/x_test.csv", index=False, float_format='%.16f')

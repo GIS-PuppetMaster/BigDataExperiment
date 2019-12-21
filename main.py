@@ -126,7 +126,7 @@ if os.path.isdir('./tensor_board_logs'):
 opt = None
 if not os.path.exists('./checkPoint.h5'):
     print("未找到CheckPoint，重新初始化模型")
-    x_input = Input((10, 1))
+    x_input = Input((90, 1))
 
     x1 = Conv1D(filters=4, kernel_size=3, strides=1, dilation_rate=2, padding='same')(x_input)
     x1 = BatchNormalization(epsilon=1e-4)(x1)
