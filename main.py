@@ -130,30 +130,30 @@ if not os.path.exists('./checkPoint.h5'):
 
     x1 = Conv1D(filters=4, kernel_size=3, strides=1, dilation_rate=2, padding='same')(x_input)
     x1 = BatchNormalization(epsilon=1e-4)(x1)
-    x1 = Dropout(0.2)(x1)
+    x1 = Dropout(0.5)(x1)
     x1 = ReLU()(x1)
     x1 = Conv1D(filters=4, kernel_size=2, strides=1, dilation_rate=3, padding='same',
                 kernel_regularizer=keras.regularizers.l2(0.01))(x1)
     x1 = BatchNormalization(epsilon=1e-4)(x1)
-    x1 = Dropout(0.2)(x1)
+    x1 = Dropout(0.5)(x1)
     x1 = ReLU()(x1)
 
     x2 = Conv1D(filters=4, kernel_size=5, strides=1)(x_input)
     x2 = BatchNormalization(epsilon=1e-4)(x2)
-    x2 = Dropout(0.2)(x2)
+    x2 = Dropout(0.5)(x2)
     x2 = ReLU()(x2)
     x2 = Conv1D(filters=8, kernel_size=3, strides=2)(x2)
     x2 = BatchNormalization(epsilon=1e-4)(x2)
-    x2 = Dropout(0.2)(x2)
+    x2 = Dropout(0.5)(x2)
     x2 = ReLU()(x2)
 
     x3 = Conv1D(filters=8, kernel_size=5, strides=2)(x_input)
     x3 = BatchNormalization(epsilon=1e-4)(x3)
-    x3 = Dropout(0.2)(x3)
+    x3 = Dropout(0.5)(x3)
     x3 = ReLU()(x3)
     x3 = Conv1D(filters=8, kernel_size=3, strides=1)(x3)
     x3 = BatchNormalization(epsilon=1e-4)(x3)
-    x3 = Dropout(0.2)(x3)
+    x3 = Dropout(0.5)(x3)
     x3 = ReLU()(x3)
 
     x4 = Conv1D_conv_block(x_input, filters=(16, 8, 16), block_name='stage1_conv-', data_format='channels_last')
@@ -172,11 +172,11 @@ if not os.path.exists('./checkPoint.h5'):
 
     x6 = CuDNNLSTM(10, return_sequences=True)(x_input)
     x6 = BatchNormalization()(x6)
-    x6 = Dropout(0.2)(x6)
+    x6 = Dropout(0.5)(x6)
     x6 = Activation('tanh')(x6)
     x6 = CuDNNLSTM(10, return_sequences=False)(x6)
     x6 = BatchNormalization()(x6)
-    x6 = Dropout(0.2)(x6)
+    x6 = Dropout(0.5)(x6)
     x6 = Activation('tanh')(x6)
 
     x1 = Flatten()(x1)
@@ -212,15 +212,15 @@ x_train = np.expand_dims(x_train, -1)
 y_train = pd.read_csv('Data/y_train.csv')
 
 reduce_lr = keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.8, patience=50, min_lr=0.0001)
-early_stop = keras.callbacks.EarlyStopping(monitor='val_acc', patience=200, restore_best_weights=True)
+early_stop = keras.callbacks.EarlyStopping(monitor='val_acc', patience=400, restore_best_weights=True)
 check_point = CheckPoint_Save_LR(filepath='./checkPoint.h5', monitor='val_acc', optimizer=opt, save_best_only=True,
                                  verbose=1)
 tensor_board = keras.callbacks.TensorBoard(log_dir='./tensor_board_logs', write_grads=True, write_graph=True,
                                            write_images=True)
 
 history = model.fit(x_train, y_train, epochs=2500, validation_split=0.1,
-                    callbacks=[reduce_lr, check_point, tensor_board, early_stop], verbose=2,
-                    batch_size=13632, shuffle=True)
+                    callbacks=[reduce_lr, check_point, tensor_board], verbose=2,
+                    batch_size=2048, shuffle=True, class_weight='auto')
 # 保存最后一次训练的模型
 model.save('model.h5')
 test()
