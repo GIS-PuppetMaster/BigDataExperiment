@@ -4,6 +4,7 @@ from sklearn.model_selection import *
 from sklearn.preprocessing import *
 from sklearn.ensemble import GradientBoostingClassifier
 import pickle
+from sklearn.feature_selection import *
 
 first = pd.read_csv(open('Data/初赛训练集.csv'))
 second = pd.read_csv(open('Data/second_round_training_data.csv'))
@@ -74,6 +75,8 @@ with open('GBDT_enc.json', 'wb') as f:
 # 保存GBDT
 with open('GBDT.json', 'wb') as f:
     pickle.dump(scaler, f)
+
+
 # 保存训练集和测试集
 pd.DataFrame(x_train).to_csv("Data/x_train.csv", index=False, float_format='%.16f')
 pd.DataFrame(x_test).to_csv("Data/x_test.csv", index=False, float_format='%.16f')

@@ -220,7 +220,7 @@ tensor_board = keras.callbacks.TensorBoard(log_dir='./tensor_board_logs', write_
 
 history = model.fit(x_train, y_train, epochs=2500, validation_split=0.1,
                     callbacks=[reduce_lr, check_point, tensor_board], verbose=2,
-                    batch_size=2048, shuffle=True, class_weight='auto')
+                    batch_size=5120, shuffle=True, class_weight='auto')
 # 保存最后一次训练的模型
 model.save('model.h5')
 test()
