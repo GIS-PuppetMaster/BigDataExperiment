@@ -9,12 +9,13 @@ from sklearn.feature_selection import *
 first = pd.read_csv(open('Data/初赛训练集.csv'))
 second = pd.read_csv(open('Data/second_round_training_data.csv'))
 data = pd.concat((first, second), axis=0, sort=False)
+"""
 # 剔除B类属性
 for i in range(1, 11):
     data.pop('Attribute' + str(i))
-
+"""
 # 补全缺失值为0
-data = data.fillna(0)
+# data = data.fillna(0)
 
 """
 # 添加特征
@@ -61,7 +62,6 @@ with open('Scaler.json', 'wb') as f:
 x_train, x_test, y_train, y_test = train_test_split(x, label, test_size=0.2, random_state=42)
 
 # 使用GBDT进行特征组合
-
 gbdt_enc = OneHotEncoder()
 gbdt = GradientBoostingClassifier(n_estimators=10)
 gbdt.fit(x_train, enc.inverse_transform(y_train))

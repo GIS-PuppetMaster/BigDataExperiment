@@ -17,9 +17,9 @@ def print_col_index(x_new, mod):
 
 # 载入数据集
 dataset = np.array(pd.read_csv(open('Data/data.csv')))
-x = dataset[:, 1:11]
-y = dataset[:, 11]
-
+x = dataset[:, 1:21]
+y = dataset[:, 21]
+"""
 # 单变量方差特征选择
 selector = GenericUnivariateSelect(score_func=f_classif, mode='percentile', param=10)
 x_new = selector.fit_transform(x, y)
@@ -40,14 +40,14 @@ x_new = selector.fit_transform(x, y)
 for i in range(x_new.shape[1]):
     print_col_index(x_new[:, i].reshape(-1, 1), "XGBoost-AccScoring循环")
 print("")
-
+"""
 # 单变量关联分析
 for i in range(1, x.shape[1] + 1):
     # 提取元组
-    data = dataset[:, [i, -1]]
+    data = dataset[:, [i, -11, -10, -9, -8, -7, -6, -5, -4, -3, -2, -1]]
     # 按特征大小排序
     data = np.array(
-        pd.DataFrame(data, columns=['param', 'label']).sort_values(axis=0, by='param', ascending=True, inplace=False))
+        pd.DataFrame(data, columns=['param', 'att1','att2','att3','att4','att5','att6','att7','att8','att9','att10','label']).sort_values(axis=0, by='param', ascending=True, inplace=False))
 
     # 使用等频离散将feature离散化
     # 区间数目

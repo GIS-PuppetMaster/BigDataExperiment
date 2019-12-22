@@ -18,6 +18,12 @@ def test():
     x_test = np.array(x_test)
     x_test = np.expand_dims(x_test, -1)
     y_test_size = y_test.shape[0]
+    modelB = keras.models.load_model('checkPointB.h5')
+    x = x_test[:, 0:10]
+    x_testB = modelB.predict(x)
+    x_test = np.delete(x_test,[i for i in range(10,20)],axis=1)
+    for i in range(x_testB.shape[1]):
+        x_test = np.insert(arr=x_test,obj=10+i,values=x_testB[:,i].reshape(-1,1),axis=1)
     model = keras.models.load_model('checkPoint.h5')
     predict = model.predict(x_test)
     eva = model.evaluate(x_test, y_test)
@@ -67,6 +73,5 @@ def test():
             ans_pred = np.concatenate((ans_pred, label_pred), axis=0)
     score = 1 / (1 + 10 * mean_absolute_error(y_true=ans_test, y_pred=ans_pred))
     print("score:" + str(score))
-
 
 # test()
