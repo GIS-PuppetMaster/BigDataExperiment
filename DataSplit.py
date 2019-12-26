@@ -67,6 +67,10 @@ gbdt = GradientBoostingClassifier(n_estimators=10)
 gbdt.fit(x_train, enc.inverse_transform(y_train))
 x_train_gbdt = np.array((gbdt_enc.fit_transform(gbdt.apply(x_train)[:, :, 0])).toarray())
 x_test_gbdt = np.array((gbdt_enc.transform(gbdt.apply(x_test)[:, :, 0])).toarray())
+# 对组合特征标准化
+x_train_gbdt = StandardScaler().fit_transform(x_train_gbdt)
+x_train_gbdt = StandardScaler().fit_transform(x_test_gbdt)
+# 特征合并
 x_train = np.concatenate((x_train, x_train_gbdt), axis=1)
 x_test = np.concatenate((x_test, x_test_gbdt), axis=1)
 # 保存编码器

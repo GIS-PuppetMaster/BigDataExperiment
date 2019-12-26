@@ -119,6 +119,7 @@ class CheckPoint_Save_LR(keras.callbacks.Callback):
                 else:
                     self.model.save(filepath, overwrite=True)
 
+
 lr = 0.05
 
 if os.path.isdir('./tensor_board_logs'):
@@ -126,7 +127,7 @@ if os.path.isdir('./tensor_board_logs'):
 opt = None
 if not os.path.exists('./checkPoint.h5'):
     print("未找到CheckPoint，重新初始化模型")
-    x_input = Input((96, 1))
+    x_input = Input((93, 1))
 
     x1 = Conv1D(filters=4, kernel_size=3, strides=1, dilation_rate=2, padding='same')(x_input)
     x1 = BatchNormalization(epsilon=1e-4)(x1)
@@ -199,8 +200,8 @@ else:
     model = load_model('checkPoint.h5')
     with open('checkPoint_LR.json', 'rb') as f:
         temp_lr = pickle.load(f)
-    order = input("是否使用上次学习率:"+str(temp_lr)+"？(y/n)")
-    if order=='y':
+    order = input("是否使用上次学习率:" + str(temp_lr) + "？(y/n)")
+    if order == 'y':
         lr = temp_lr
     opt = keras.optimizers.Adam(lr)
     model.compile(opt, loss=keras.losses.categorical_crossentropy, metrics=['mae', 'acc'])
@@ -208,6 +209,7 @@ else:
     print("加载学习率:" + str(lr))
 
 x_train = np.array(pd.read_csv('Data/x_train.csv'))
+x_train = np.concatenate((x_train[:, 0:10], x_train[:, 13:]), axis=1)
 x_train = np.expand_dims(x_train, -1)
 y_train = pd.read_csv('Data/y_train.csv')
 
