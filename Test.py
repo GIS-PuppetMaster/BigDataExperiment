@@ -17,7 +17,7 @@ def test():
     y_test = np.array(pd.read_csv('Data/y_test.csv'))
     x_test = np.array(x_test)
     # 剔除Attr1-3
-    x_test = np.concatenate((x_test[:, 0:10], x_test[:, 13:]), axis=1)
+    # x_test = np.concatenate((x_test[:, 0:10], x_test[:, 13:]), axis=1)
 
     x_test = np.expand_dims(x_test, -1)
     y_test_size = y_test.shape[0]
@@ -27,9 +27,9 @@ def test():
     x_testB = modelB.predict(x)
 
     # 删除原先标记的所有数据
-    # x_test = np.delete(x_test, [i for i in range(10, 20)], axis=1)
+    x_test = np.delete(x_test, [i for i in range(10, 20)], axis=1)
     # 若剔除Attr1-3，则使用这行代码替代上面的
-    x_test = np.delete(x_test, [i for i in range(10, 17)], axis=1)
+    # x_test = np.delete(x_test, [i for i in range(10, 17)], axis=1)
 
     # 插入预测的B类特征
     for i in range(x_testB.shape[1]):

@@ -16,7 +16,7 @@ import pickle
 from Test import test
 
 x_train = np.array(pd.read_csv('Data/x_train.csv'))
-y_train = x_train[:, 13:20]
+y_train = x_train[:, 10:20]
 x_train = x_train[:, 0:10]
 x_train = np.expand_dims(x_train, -1)
 class CheckPoint_Save_LR(keras.callbacks.Callback):
@@ -191,7 +191,7 @@ if not os.path.exists('./checkPointB.h5'):
 
     # x = Concatenate()([x2, x4, x5, x6])
     x = Dense_BN(x5, 64)
-    x = Dense(7)(x)
+    x = Dense(10)(x)
 
     model = Model(inputs=[x_input], outputs=[x])
     plot_model(model, to_file='modelB.png', show_shapes=True)
